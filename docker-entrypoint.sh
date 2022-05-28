@@ -3,17 +3,17 @@
 set -e
 
 if [ "$(id -u)" = "0" ]; then
-  if [ -n "$UID" ] && [ ! "$UID" = "$(id krusty -u)" ]; then
-    usermod -u "$UID" krusty
+  if [ -n "$UID" ] && [ ! "$UID" = "$(id dummy -u)" ]; then
+    usermod -u "$UID" dummy
   fi
 
-  if [ -n "$GID" ] && [ ! "$GID" = "$(id krusty -g)" ]; then
-    groupmod -g "$GID" krusty
+  if [ -n "$GID" ] && [ ! "$GID" = "$(id dummy -g)" ]; then
+    groupmod -g "$GID" dummy
   fi
 
-  chown krusty:krusty /home/krusty
+  chown dummy:dummy /home/dummy
 
-  exec gosu krusty "$@"
+  exec gosu dummy "$@"
 else
   exec "$@"
 fi

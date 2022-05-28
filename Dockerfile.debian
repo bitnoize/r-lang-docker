@@ -2,14 +2,15 @@
 FROM bitnoize/debian-backports:bullseye
 
 ARG DEBIAN_FRONTEND=noninteractive
+ARG CRAN_RELEASE=cran40
 
 RUN set -eux; \
-    groupadd -g 1000 krusty; \
-    useradd -M -d /home/krusty -s /bin/bash -g 1000 -u 1000 krusty; \
-    usermod -a -G staff krusty; \
-    mkdir -p /home/krusty; \
-    chown krusty:krusty /home/krusty; \
-    chmod 750 /home/krusty
+    groupadd -g 1000 dummy; \
+    useradd -M -d /home/dummy -s /bin/bash -g 1000 -u 1000 dummy; \
+    usermod -a -G staff dummy; \
+    mkdir -p /home/dummy; \
+    chown dummy:dummy /home/dummy; \
+    chmod 750 /home/dummy
 
 RUN set -eux; \
     # R-Project APT
@@ -18,7 +19,7 @@ RUN set -eux; \
     echo "Pin-Priority: 1000"   >> /etc/apt/preferences.d/20r-project; \
     wget -q -O- "http://keyserver.ubuntu.com/pks/lookup?op=get&search=0x95c0faf38db3ccad0c080a7bdc78b2ddeabc47b7" | \
         gpg --dearmor > /usr/share/keyrings/r-project-archive-keyring.gpg; \
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/r-project-archive-keyring.gpg] http://cloud.r-project.org/bin/linux/debian bullseye-cran40/" > \
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/r-project-archive-keyring.gpg] http://cloud.r-project.org/bin/linux/debian bullseye-${CRAN_RELEASE}/" > \
         /etc/apt/sources.list.d/r-project.list; \
     # Debian packages
     apt-get update -q; \
