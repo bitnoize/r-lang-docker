@@ -2,7 +2,7 @@
 FROM bitnoize/debian-backports:bullseye
 
 ARG DEBIAN_FRONTEND=noninteractive
-ARG CRAN_RELEASE=cran40
+ARG CRAN_REPOSITORY=cran40
 
 RUN set -eux; \
     groupadd -g 1000 dummy; \
@@ -19,7 +19,7 @@ RUN set -eux; \
     echo "Pin-Priority: 1000"   >> /etc/apt/preferences.d/20r-project; \
     wget -q -O- "http://keyserver.ubuntu.com/pks/lookup?op=get&search=0x95c0faf38db3ccad0c080a7bdc78b2ddeabc47b7" | \
         gpg --dearmor > /usr/share/keyrings/r-project-archive-keyring.gpg; \
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/r-project-archive-keyring.gpg] http://cloud.r-project.org/bin/linux/debian bullseye-${CRAN_RELEASE}/" > \
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/r-project-archive-keyring.gpg] http://cloud.r-project.org/bin/linux/debian bullseye-${CRAN_REPOSITORY}/" > \
         /etc/apt/sources.list.d/r-project.list; \
     # Debian packages
     apt-get update -q; \

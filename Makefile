@@ -1,32 +1,31 @@
 
 IMAGENAME="bitnoize/r-base"
 
-.PHONY: help build push test all
+.PHONY: help build push shell
+
+.DEFAULT_GOAL := help
 
 help:
-	@echo "Makefile commands: build push test"
+	@echo "Makefile commands: build push shell"
 
-.DEFAULT_GOAL := all
+build: .build-cran40-bullseye
 
-build: .build-cran40-debian
-
-push: .push-cran40-debian
-
-.build-cran40-debian:
+.build-cran40-bullseye:
 	docker build --pull --no-cache \
 		-t "$(IMAGENAME):4.2-bullseye" \
 		-t "$(IMAGENAME):latest" \
-		-f Dockerfile.debian \
+		-f Dockerfile.bullseye \
 		.
 
-.push-cran40-debian:
+push: .push-cran40-bullseye
+
+.push-cran40-bullseye:
 	docker push "$(IMAGENAME):4.2-bullseye"
 	docker push "$(IMAGENAME):latest"
 
-test:
+shell:
 	docker run -it --rm \
-		--name test-r-shell \
-		bitnoize/r-base:latest
-
-all: build push
+		--name r-base-shell \
+		bitnoize/r-base:latest \
+		/bin/bash
 
