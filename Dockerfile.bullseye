@@ -5,14 +5,13 @@ ARG DEBIAN_FRONTEND=noninteractive
 ARG CRAN_REPOSITORY=cran40
 
 RUN set -eux; \
+    # Fake user
     groupadd -g 1000 dummy; \
     useradd -M -d /home/dummy -s /bin/bash -g 1000 -u 1000 dummy; \
     usermod -a -G staff dummy; \
     mkdir -p /home/dummy; \
     chown dummy:dummy /home/dummy; \
-    chmod 750 /home/dummy
-
-RUN set -eux; \
+    chmod 750 /home/dummy; \
     # R-Project APT
     echo "Package: *"           >> /etc/apt/preferences.d/20r-project; \
     echo "Pin: release o=CRAN"  >> /etc/apt/preferences.d/20r-project; \
