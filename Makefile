@@ -1,20 +1,18 @@
 
 IMAGENAME := bitnoize/r-base
 
-.PHONY: help build rebuild
+.PHONY: help build rebuild push pull
 
 .DEFAULT_GOAL := help
 
 help:
-	@echo "Makefile commands: build rebuild"
+	@echo "Makefile commands: build rebuild push pull"
 
 #build: export BUILD_OPTS := ...
-#build: export PUSH_OPTS := ...
-build: .build-cran40-bullseye .push-cran40-bullseye
+build: .build-cran40-bullseye
 
 rebuild: export BUILD_OPTS := --pull --no-cache
-#rebuild: export PUSH_OPTS := ...
-rebuild: .build-cran40-bullseye .push-cran40-bullseye
+rebuild: .build-cran40-bullseye
 
 .build-cran40-bullseye:
 	docker build $(BUILD_OPTS) \
@@ -24,7 +22,17 @@ rebuild: .build-cran40-bullseye .push-cran40-bullseye
 		-f Dockerfile.bullseye \
 		.
 
+#push: export PUSH_OPTS := ...
+push: .push-cran40-bullseye
+
 .push-cran40-bullseye:
 	docker push $(PUSH_OPTS) "$(IMAGENAME):cran40-bullseye"
 	docker push $(PUSH_OPTS) "$(IMAGENAME):latest"
+
+#pull: export PULL_OPTS := ...
+pull: .pull-cran40-bullseye
+
+.pull-cran40-bullseye:
+	docker pull $(PULL_OPTS) "$(IMAGENAME):cran40-bullseye"
+	docker pull $(PULL_OPTS) "$(IMAGENAME):latest"
 
