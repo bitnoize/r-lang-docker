@@ -1,37 +1,30 @@
 
-IMAGENAME="bitnoize/r-base"
+IMAGENAME := bitnoize/r-base
 
-.PHONY: help build push pull shell
+.PHONY: help build rebuild
 
 .DEFAULT_GOAL := help
 
 help:
-	@echo "Makefile commands: build push pull shell"
+	@echo "Makefile commands: build rebuild"
 
-build: .build-cran40-bullseye
+#build: export BUILD_OPTS := ...
+#build: export PUSH_OPTS := ...
+build: .build-cran40-bullseye .push-cran40-bullseye
+
+rebuild: export BUILD_OPTS := --pull --no-cache
+#rebuild: export PUSH_OPTS := ...
+rebuild: .build-cran40-bullseye .push-cran40-bullseye
 
 .build-cran40-bullseye:
-	docker build --pull --no-cache \
-		-t "$(IMAGENAME):4.2-bullseye" \
+	docker build $(BUILD_OPTS) \
+		--build-arg CRAN_REPOSITORY=cran40 \
+		-t "$(IMAGENAME):cran40-bullseye" \
 		-t "$(IMAGENAME):latest" \
 		-f Dockerfile.bullseye \
 		.
 
-push: .push-cran40-bullseye
-
 .push-cran40-bullseye:
-	docker push "$(IMAGENAME):4.2-bullseye"
-	docker push "$(IMAGENAME):latest"
-
-pull: .pull-cran40-bullseye
-
-.pull-cran40-bullseye:
-	docker pull "$(IMAGENAME):4.2-bullseye"
-	docker pull "$(IMAGENAME):latest"
-
-shell:
-	docker run -it --rm \
-		--name r-base-shell \
-		bitnoize/r-base:latest \
-		/bin/bash
+	docker push $(PUSH_OPTS) "$(IMAGENAME):cran40-bullseye"
+	docker push $(PUSH_OPTS) "$(IMAGENAME):latest"
 

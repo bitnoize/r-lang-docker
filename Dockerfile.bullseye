@@ -1,5 +1,5 @@
 
-FROM bitnoize/debian-backports:bullseye
+FROM bitnoize/debian:bullseye
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG CRAN_REPOSITORY=cran40
@@ -11,7 +11,9 @@ RUN set -eux; \
     usermod -a -G staff dummy; \
     mkdir -p /home/dummy; \
     chown dummy:dummy /home/dummy; \
-    chmod 750 /home/dummy; \
+    chmod 750 /home/dummy
+
+RUN set -eux; \
     # R-Project APT
     echo "Package: *"           >> /etc/apt/preferences.d/20r-project; \
     echo "Pin: release o=CRAN"  >> /etc/apt/preferences.d/20r-project; \
