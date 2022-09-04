@@ -5,15 +5,6 @@ ARG DEBIAN_FRONTEND=noninteractive
 ARG CRAN_REPOSITORY=cran40
 
 RUN set -eux; \
-    # Fake user
-    groupadd -g 1000 dummy; \
-    useradd -M -d /home/dummy -s /bin/bash -g 1000 -u 1000 dummy; \
-    usermod -a -G staff dummy; \
-    mkdir -p /home/dummy; \
-    chown dummy:dummy /home/dummy; \
-    chmod 750 /home/dummy
-
-RUN set -eux; \
     # R-Project APT
     echo "Package: *"           >> /etc/apt/preferences.d/20r-project; \
     echo "Pin: release o=CRAN"  >> /etc/apt/preferences.d/20r-project; \
@@ -25,23 +16,20 @@ RUN set -eux; \
     # Debian packages
     apt-get update -q; \
     apt-get install -yq \
-        gosu build-essential git libopenblas0-pthread \
+        build-essential git libopenblas0-pthread \
         r-cran-docopt r-cran-littler r-base r-base-dev r-base-core r-recommended; \
     # R package installer
-	  ln -s /usr/lib/R/site-library/littler/examples/install.r /usr/local/bin/install.r; \
-	  ln -s /usr/lib/R/site-library/littler/examples/install2.r /usr/local/bin/install2.r; \
-	  ln -s /usr/lib/R/site-library/littler/examples/installBioc.r /usr/local/bin/installBioc.r; \
-	  ln -s /usr/lib/R/site-library/littler/examples/installDeps.r /usr/local/bin/installDeps.r; \
-	  ln -s /usr/lib/R/site-library/littler/examples/installGithub.r /usr/local/bin/installGithub.r; \
-	  ln -s /usr/lib/R/site-library/littler/examples/testInstalled.r /usr/local/bin/testInstalled.r; \
+    ln -s /usr/lib/R/site-library/littler/examples/install.r /usr/local/bin/install.r; \
+    ln -s /usr/lib/R/site-library/littler/examples/install2.r /usr/local/bin/install2.r; \
+    ln -s /usr/lib/R/site-library/littler/examples/installBioc.r /usr/local/bin/installBioc.r; \
+    ln -s /usr/lib/R/site-library/littler/examples/installDeps.r /usr/local/bin/installDeps.r; \
+    ln -s /usr/lib/R/site-library/littler/examples/installGithub.r /usr/local/bin/installGithub.r; \
+    ln -s /usr/lib/R/site-library/littler/examples/testInstalled.r /usr/local/bin/testInstalled.r; \
     # Clean-up
-	  rm -rf /tmp/downloaded_packages/ /tmp/*.rds; \
-	  rm -rf /var/lib/apt/lists/*; \
+    rm -rf /var/lib/apt/lists/*; \
+    rm -rf /tmp/downloaded_packages/ /tmp/*.rds; \
     # Smoke tests
     R --version
-
-COPY docker-entrypoint.sh /sbin/entrypoint.sh
-ENTRYPOINT ["entrypoint.sh"]
 
 CMD ["R"]
 
