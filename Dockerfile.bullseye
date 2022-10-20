@@ -1,18 +1,34 @@
 
-FROM bitnoize/debian:bullseye
+FROM ghcr.io/bitnoize/debian:bullseye
 
 ARG DEBIAN_FRONTEND=noninteractive
+
 ARG CRAN_REPOSITORY=cran40
+ENV CRAN_REPOSITORY=${CRAN_REPOSITORY}
+
+RUN set -eux; \
+    # Unprivileged user
+    groupadd -g 1000 dummy; \
+    useradd -M -d /var/lib/dummy -s /bin/bash -g 1000 -u 1000 dummy; \
+    usermod -a -G tty,staff dummy; \
+    mkdir -m 0750 /var/lib/dummy; \
+    chown dummy:dummy /var/lib/dummy
+
+COPY docker-entrypoint.sh /sbin/entrypoint.sh
+ENTRYPOINT ["entrypoint.sh"]
 
 RUN set -eux; \
     # R-Project APT
-    echo "Package: *"           >> /etc/apt/preferences.d/20r-project; \
-    echo "Pin: release o=CRAN"  >> /etc/apt/preferences.d/20r-project; \
-    echo "Pin-Priority: 1000"   >> /etc/apt/preferences.d/20r-project; \
     wget -q -O- "http://keyserver.ubuntu.com/pks/lookup?op=get&search=0x95c0faf38db3ccad0c080a7bdc78b2ddeabc47b7" | \
-        gpg --dearmor > /usr/share/keyrings/r-project-archive-keyring.gpg; \
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/r-project-archive-keyring.gpg] http://cloud.r-project.org/bin/linux/debian bullseye-${CRAN_REPOSITORY}/" > \
-        /etc/apt/sources.list.d/r-project.list; \
+        gpg --dearmor > /usr/share/keyrings/r-project.gpg; \
+    { \
+        echo "Package: *"; \
+        echo "Pin: release o=CRAN"; \
+        echo "Pin-Priority: 1000"; \
+    } | tee /etc/apt/preferences.d/20r-project; \
+    { \
+        echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/r-project.gpg] http://cloud.r-project.org/bin/linux/debian bullseye-${CRAN_REPOSITORY}/"; \
+    } | tee /etc/apt/sources.list.d/r-project.list; \
     # Debian packages
     apt-get update -q; \
     apt-get install -yq \
@@ -26,8 +42,14 @@ RUN set -eux; \
     ln -s /usr/lib/R/site-library/littler/examples/installGithub.r /usr/local/bin/installGithub.r; \
     ln -s /usr/lib/R/site-library/littler/examples/testInstalled.r /usr/local/bin/testInstalled.r; \
     # Clean-up
-    rm -rf /var/lib/apt/lists/*; \
-    rm -rf /tmp/downloaded_packages/ /tmp/*.rds; \
+    rm -rf \
+        /var/www/* \
+        /usr/share/doc/* \
+        /usr/share/info/* \
+        /usr/share/man/* \
+        /var/lib/apt/lists/* \
+        /tmp/downloaded_packages/ \
+        /tmp/*.rds; \
     # Smoke tests
     R --version
 

@@ -1,5 +1,5 @@
-r-base-docker
-=============
+R-base
+------
 
 Dockerfile for R language environment.
 
