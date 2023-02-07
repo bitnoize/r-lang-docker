@@ -11,7 +11,7 @@ if [ "$(id -u)" = "0" ]; then
     groupmod -g "$GID" dummy
   fi
 
-  chown -R dummy:dummy /var/lib/dummy \
+  chown dummy:dummy /var/lib/dummy \
 
   if [ -d "/lib/entrypoint" ]; then
     run-parts -v --regex '.*sh$' /lib/entrypoint
