@@ -1,7 +1,7 @@
 
 FROM ghcr.io/bitnoize/debian:bullseye
 
-LABEL org.opencontainers.image.source=https://github.com/bitnoize/r-base-docker
+LABEL org.opencontainers.image.source=https://github.com/bitnoize/r-lang-docker
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -22,20 +22,27 @@ ENTRYPOINT ["entrypoint.sh"]
 RUN set -eux; \
     # R-Project APT
     wget -q -O- "http://keyserver.ubuntu.com/pks/lookup?op=get&search=0x95c0faf38db3ccad0c080a7bdc78b2ddeabc47b7" | \
-        gpg --dearmor > /usr/share/keyrings/r-project.gpg; \
+        gpg --dearmor > /usr/share/keyrings/r-project-archive-keyring.gpg; \
     { \
         echo "Package: *"; \
         echo "Pin: release o=CRAN"; \
         echo "Pin-Priority: 1000"; \
     } | tee /etc/apt/preferences.d/20r-project; \
     { \
-        echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/r-project.gpg] http://cloud.r-project.org/bin/linux/debian bullseye-${CRAN_REPOSITORY}/"; \
+        echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/r-project-archive-keyring.gpg] http://cloud.r-project.org/bin/linux/debian bullseye-${CRAN_REPOSITORY}/"; \
     } | tee /etc/apt/sources.list.d/r-project.list; \
     # Debian packages
     apt-get update -q; \
     apt-get install -yq \
-        build-essential git libopenblas0-pthread \
-        r-cran-docopt r-cran-littler r-base r-base-dev r-base-core r-recommended; \
+        build-essential \
+        git \
+        libopenblas0-pthread \
+        r-cran-docopt \
+        r-cran-littler \
+        r-base \
+        r-base-dev \
+        r-base-core \
+        r-recommended; \
     # R package installer
     ln -s /usr/lib/R/site-library/littler/examples/install.r /usr/local/bin/install.r; \
     ln -s /usr/lib/R/site-library/littler/examples/install2.r /usr/local/bin/install2.r; \
