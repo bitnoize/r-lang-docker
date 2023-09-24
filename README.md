@@ -1,5 +1,3 @@
-R-lang
-------
-
-Dockerfile for R language environment.
+R-lang Docker
+-------------
 

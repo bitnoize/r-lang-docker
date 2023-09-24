@@ -1,5 +1,5 @@
 
-FROM ghcr.io/bitnoize/debian:bullseye
+FROM ghcr.io/bitnoize/debian:bookworm
 
 LABEL org.opencontainers.image.source=https://github.com/bitnoize/r-lang-docker
 
@@ -29,7 +29,7 @@ RUN set -eux; \
         echo "Pin-Priority: 1000"; \
     } | tee /etc/apt/preferences.d/20r-project; \
     { \
-        echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/r-project-archive-keyring.gpg] http://cloud.r-project.org/bin/linux/debian bullseye-${CRAN_REPOSITORY}/"; \
+        echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/r-project-archive-keyring.gpg] http://cloud.r-project.org/bin/linux/debian bookworm-${CRAN_REPOSITORY}/"; \
     } | tee /etc/apt/sources.list.d/r-project.list; \
     # Debian packages
     apt-get update -q; \
@@ -62,5 +62,5 @@ RUN set -eux; \
     # Smoke tests
     R --version
 
-CMD ["R"]
+CMD ["/bin/bash"]
 
